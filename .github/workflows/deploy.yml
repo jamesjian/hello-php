@@ -1,0 +1,25 @@
+name : Build and test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Build Docker image
+        run: docker build -t hello-php .
+        
+      - name: Verify container starts
+        run: |
+          docker run -d -p 8081:80 --name test-container hello-php
+          sleep 3
+          curl --fail http://localhost:8081 || exit 1
+          docker stop test-container
+          
