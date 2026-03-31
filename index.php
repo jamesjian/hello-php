@@ -1,2 +1,2 @@
 <?php
-echo "Hello world  first push!";
+echo "Hello world  first automated push!";
