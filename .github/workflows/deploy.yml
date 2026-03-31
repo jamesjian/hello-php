@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - main
-
+env:
+  AWS_REGION: ap-southeast-2
+  ECR_REPOSITORY: hello-php
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,13 +15,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
         
-      - name: Build Docker image
-        run: docker build -t hello-php .
+      - name: Build , tag and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         
       - name: Verify container starts
         run: |
-          docker run -d -p 8081:80 --name test-container hello-php
+          docker run -d -p 8081:80 --name test-container  ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
           sleep 3
           curl --fail http://localhost:8081 || exit 1
           docker stop test-container
