@@ -1,5 +1,7 @@
 #Docker
 .env
+.env.production
+.env.staging
 #OS
 .DS_Store
 Thumbs.db
