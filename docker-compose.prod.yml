@@ -1,13 +1,11 @@
 services:
   web:
-    build: .
-    ports: 
-      - "8081:80"
-    volumes:
-      - ./index.php:/var/www/html/index.php
+    image: ${ECR_REGISTRY}/hello-php:latest
+    ports:
+      - "80:80"
     environment:
       DB_HOST: db
-      DB_USER: phpuser      
+      DB_USER: phpuser
       DB_PASS: secret
       DB_NAME: shop
     depends_on:
@@ -15,7 +13,7 @@ services:
         condition: service_healthy
     networks:
       - app-network
-      
+
   db:
     image: mysql:8
     environment:
@@ -27,15 +25,17 @@ services:
       - db-data:/var/lib/mysql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h","localhost"]
+      test: ["CMD","mysqladmin","ping","-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
     networks:
       - app-network
-      
+
 volumes:
-  db-data:      
+  db-data:
 
 networks:
   app-network:
+  
+    
