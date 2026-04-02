@@ -35,7 +35,7 @@ $result = $conn->query("SELECT * FROM products ORDER BY id");
         <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
             <th><?= $row['id'] ?></th>
-            <td><?= $row['name'] ?></td>
+            <td style="color:red"><?= $row['name'] ?></td>
             <td>$<?= number_format($row['price'], 2) ?></td>
             <td><?= $row['stock'] ?></td>
         </tr>
